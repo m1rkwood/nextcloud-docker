@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  nextcloud:
+    build: .
+    container_name: nextcloud
+    restart: always
+    volumes:
+      - nextcloud:/var/www/html
+      - ${NEXTCLOUD_ROOT}/config:/var/www/html/config
+      - ${NEXTCLOUD_ROOT}/custom_apps:/var/www/html/custom_apps
+      - ${NEXTCLOUD_ROOT}/themes:/var/www/html/themes
+      - ${NEXTCLOUD_ROOT}/data:/var/www/html/data
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - mariadb
+      - redis
+    ports:
+      - 8080:80
+      - 443:443
+    environment:
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=nextcloud-mariadb
+      - REDIS_HOST=nextcloud-redis
+      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
+
+  mariadb:
+    image: mariadb
+    container_name: nextcloud-mariadb
+    restart: always
+    command:
+      - "--transaction-isolation=READ-COMMITTED"
+      - "--binlog-format=ROW"
+      - "--max_allowed_packet=32505856"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - mariadb:/var/lib/mysql
+      #
+      # if you prefer using filesystem instead
+      # - ${NEXTCLOUD_ROOT}/mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  redis:
+    image: redis:alpine
+    container_name: nextcloud-redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+
+volumes:
+  nextcloud:
+  mariadb:

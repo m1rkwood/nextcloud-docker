@@ -1,0 +1,4 @@
+/app
+/proxy
+.env
+.DS_STORE
