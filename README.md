@@ -57,7 +57,7 @@ To find the id or name of your container
 $ docker ps
 ```
 
-### Video Thumbnails
+### Thumbnails
 
 Videos don't show thumbnails by default in Nextcloud. Here's how to fix it
 
@@ -95,6 +95,25 @@ Add these values to the `app/config/config.php`
    15 => 'OC\\Preview\\MP4',
    16 => 'OC\\Preview\\AVI',
   ),
+```
+
+#### Auto generate thumbnails
+
+In the admin of Nextcloud, install the app `Preview Generator`
+Then on the host server, run this command to generate all previews
+
+```
+docker exec -it nextcloud sudo -u www-data php /var/www/html/occ preview:generate-all -vvv
+```
+
+Still on the host server, add a cronjob
+
+```
+crontab -u <username> -e
+```
+
+```
+*/30 * * * * docker exec nextcloud sudo -u www-data php /var/www/html/occ preview:pre-generate
 ```
 
 ### Update Nextcloud
