@@ -54,7 +54,7 @@ services:
     command:
       - "--transaction-isolation=READ-COMMITTED"
       - "--binlog-format=ROW"
-      - "--max_allowed_packet=32505856"
+      - "--performance-schema=OFF"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - mariadb:/var/lib/mysql
