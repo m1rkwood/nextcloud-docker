@@ -27,7 +27,8 @@ DOMAIN_NAME=
 
 For `NEXTCLOUD_ROOT`, navigate to your desired folder, and type `pwd` to know its absolute path. Any path will do, as an example, `/home/nextcloud` or `/root/nextcloud` will both work. For the passwords, generate strong passwords.
 
-`NEXTCLOUD_HOST` is the domain used, i.e. `cloud.domain.com`
+`SUB_DOMAIN` is the sub-domain used, i.e. `cloud`  
+`DOMAIN_NAME` is the domain used, i.e. `example.com`
 
 ## Build the image & start the containers
 
