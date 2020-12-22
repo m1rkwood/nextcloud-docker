@@ -45,6 +45,17 @@ restore your database
 cat nextcloud_backup.sql | docker exec -i <CONTAINER_NAME_OR_ID> /usr/bin/mysql -u nextcloud --password=<MYSQL_PASSWORD> <DB_NAME>
 ```
 
+### Backup the database automatically
+
+You can add a cronjob to backup your database regularly.  
+On the host server, run `crontab -u <username> -e` and add the following:
+
+```
+0 8 * * 1 docker exec <CONTAINER_NAME_OR_ID> /usr/bin/mysqldump -u <MYSQL_USER> --password="<MYSQL_PASSWORD>" <DATABASE_NAME> > <PATH_TO_BACKUPS>/backup_`date +%Y%m%d%H%M%S`.sql
+```
+
+This one runs every Monday at 8am, you can change it at your convenience.
+
 ### Open a Docker console
 
 ```
