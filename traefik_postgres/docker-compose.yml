@@ -13,13 +13,13 @@ services:
       - ${NEXTCLOUD_ROOT}/data:/var/www/html/data
       - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - mariadb
+      - postgres
       - redis
     environment:
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_HOST=nextcloud-mariadb
+      - POSTGRES_HOST=nextcloud-postgres
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - REDIS_HOST=nextcloud-redis
       - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
       - TRUSTED_PROXIES=172.18.0.0/16
@@ -47,25 +47,17 @@ services:
       - web
       - internal
 
-  mariadb:
-    image: mariadb
-    container_name: nextcloud-mariadb
+  postgres:
+    image: postgres:alpine
+    container_name: nextcloud-postgres
     restart: always
-    command:
-      - "--transaction-isolation=READ-COMMITTED"
-      - "--binlog-format=ROW"
-      - "--log-bin=/var/log/mysql/mysql-bin.log"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - mariadb:/var/lib/mysql
-      #
-      # if you prefer using filesystem instead
-      # - ${NEXTCLOUD_ROOT}/mariadb:/var/lib/mysql
+      - postgres:/var/lib/postgresql/data
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - internal
 
@@ -79,7 +71,7 @@ services:
 
 volumes:
   nextcloud:
-  mariadb:
+  postgres:
 
 networks:
   web:

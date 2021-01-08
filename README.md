@@ -9,9 +9,12 @@ All configurations use Redis and MariaDB. The difference is how they handle SSL 
 - `nginx_proxy`: the setup handles SSL certificates through letsencrypt and a nginx reverse proxy.
 - `self_signed`: easier setup available with self-signed certificate. Though with self-signed certificates, most sync features won't work (i.e. syncing calendars, contacts to your phone)
 - `traefik`: uses traefik for routing, easier to add other services on top.
+- `traefik_postgres`: same, but with postgreSQL as a database.
 
 Choose the one you are the most comfortable with. Each folder has its own `README.md` file to install its specific case.  
-If you choose the `traefik` version, you will have to also install the `traefik-docker` project available [here](https://github.com/m1rkwood/traefik-docker).
+If you choose the `traefik` or `traefik_postgres` version, you will have to also install the `traefik-docker` project available [here](https://github.com/m1rkwood/traefik-docker).  
+
+Note: on smaller instances, I found postgreSQL to be more reliable, doesn't time out as much, doesn't go out of memory as much.
 
 ## Setup your DNS
 
@@ -33,16 +36,21 @@ For `TTL`, I used the lowest available or `Automatic`
 
 ### Backup & Restore the database
 
-backup your database
-
+backup your database (mariaDB)
 ```
-docker exec <CONTAINER_NAME_OR_ID> /usr/bin/mysqldump -u nextcloud --password=<MYSQL_PASSWORD> <DB_NAME> > nextcloud_backup.sql
+docker exec <CONTAINER_NAME_OR_ID> /usr/bin/mysqldump -u <MYSQL_USER> --password=<MYSQL_PASSWORD> <DATABASE_NAME> > nextcloud_backup.sql
 ```
-
-restore your database
-
+backup your database (postgreSQL)
 ```
-cat nextcloud_backup.sql | docker exec -i <CONTAINER_NAME_OR_ID> /usr/bin/mysql -u nextcloud --password=<MYSQL_PASSWORD> <DB_NAME>
+docker exec <CONTAINER_NAME_OR_ID> pg_dump -U <POSTGRES_USER> <DATABASE_NAME> > nextcloud_backup.sql
+```
+restore your database (mariaDB)
+```
+cat nextcloud_backup.sql | docker exec -i <CONTAINER_NAME_OR_ID> /usr/bin/mysql -u <MYSQL_USER> --password=<MYSQL_PASSWORD> <DATABASE_NAME>
+```
+restore your database (postgreSQL)
+```
+docker exec <CONTAINER_NAME_OR_ID> psql <DATABASE_NAME> < nextcloud_backup.sql
 ```
 
 ### Backup the database automatically
@@ -50,8 +58,13 @@ cat nextcloud_backup.sql | docker exec -i <CONTAINER_NAME_OR_ID> /usr/bin/mysql 
 You can add a cronjob to backup your database regularly.  
 On the host server, run `crontab -u <username> -e` and add the following:
 
+MariaDB:
 ```
 0 8 * * 1 docker exec <CONTAINER_NAME_OR_ID> /usr/bin/mysqldump -u <MYSQL_USER> --password="<MYSQL_PASSWORD>" <DATABASE_NAME> > <PATH_TO_BACKUPS>/backup_`date +%Y%m%d%H%M%S`.sql
+```
+PostgreSQL:
+```
+0 8 * * 1 docker exec <CONTAINER_NAME_OR_ID> pg_dump -U <POSTGRES_USER> <DATABASE_NAME> > <PATH_TO_BACKUPS>/backup_`date +%Y%m%d%H%M%S`.sql
 ```
 
 This one runs every Monday at 8am, you can change it at your convenience.
