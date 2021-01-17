@@ -158,10 +158,16 @@ crontab -u <username> -e
 
 ### Scan new files on the server
 
-If you happen to add files directly on the server and want to see them in your Nextcloud instance, add them to your files at `app/data/<USERNAME>/files/`, then open the docker console of your nextcloud container and run:
+If you happen to add files directly on the server and want to see them in your Nextcloud instance, add them to your files at `app/data/<USERNAME>/files/`  
 
+Navigate to the new folder and add the proper permissions to the files
 ```
-sudo -u www-data /var/www/html/occ files:scan <USERNAME>
+sudo chown -R www-data:www-data </path/to/nextcloud/data/>
+```
+
+Then make Nextcloud scan the new files
+```
+docker exec -i <container_name> sudo -u www-data /var/www/html/occ files:scan <username>
 ```
 
 ### Setup cronjobs
