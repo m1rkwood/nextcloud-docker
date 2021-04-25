@@ -81,7 +81,7 @@ To find the id or name of your container
 $ docker ps
 ```
 
-### Thumbnails
+### Photos & Thumbnails
 
 #### Auto generate thumbnails
 
@@ -142,7 +142,7 @@ Add these values to the `app/config/config.php`
 'jpeg_quality' => '60',
 ```
 
-### Modify thumbnail sizes
+#### Modify thumbnail sizes
 Default sizes for `previewgenerator` are ok but they're going to take space over time, so I changed their default size. It's also improving the gallery performance overall.
 
 ```
@@ -155,6 +155,14 @@ docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ co
 
 ```
 docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ config:app:set --value="256" previewgenerator heightSizes
+```
+
+#### Ordering Photos
+When uploading directly through the desktop app, your photos might be out of order because Nextcloud doesn't read `EXIF` formats. Instead it takes into consideration the Created & Modified dates of a picture.
+
+Before uploading your pictures to Nextcloud, you can change their Created & Modified dates based on `EXIF` data. Install the command line tool `exiftool` and run this in the folder you want to upload (this will also work for .MOV files).
+```
+exiftool "-filecreatedate<datetimeoriginal" . && exiftool "-FileCreateDate<CreateDate" -ext Mov . && exiftool "-FileModifyDate<datetimeoriginal" . && exiftool "-FileModifyDate<CreateDate" -ext Mov .
 ```
 
 ### Update Nextcloud
