@@ -83,9 +83,27 @@ $ docker ps
 
 ### Thumbnails
 
-Videos don't show thumbnails by default in Nextcloud. Here's how to fix it
+#### Auto generate thumbnails
 
-#### Install packages
+In the admin of Nextcloud, install the app `Preview Generator`
+Then on the host server, run this command to generate all previews
+
+```
+docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ preview:generate-all -vvv
+```
+
+Still on the host server, add a cronjob
+
+```
+crontab -u <username> -e
+```
+
+```
+*/30 * * * * docker exec <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ preview:pre-generate
+```
+
+#### Install packages for Video Support
+Videos don't show thumbnails by default in Nextcloud. Here's how to fix it  
 
 Skip this step if you're using my Dockerfile, these packages will be installed by default.
 
@@ -119,25 +137,24 @@ Add these values to the `app/config/config.php`
    15 => 'OC\\Preview\\MP4',
    16 => 'OC\\Preview\\AVI',
   ),
+'preview_max_x' => '2048',
+'preview_max_y' => '2048',
+'jpeg_quality' => '60',
 ```
 
-#### Auto generate thumbnails
-
-In the admin of Nextcloud, install the app `Preview Generator`
-Then on the host server, run this command to generate all previews
+### Modify thumbnail sizes
+Default sizes for `previewgenerator` are ok but they're going to take space over time, so I changed their default size. It's also improving the gallery performance overall.
 
 ```
-docker exec -it nextcloud sudo -u www-data php /var/www/html/occ preview:generate-all -vvv
-```
-
-Still on the host server, add a cronjob
-
-```
-crontab -u <username> -e
+docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ config:app:set --value="32 256" previewgenerator squareSizes
 ```
 
 ```
-*/30 * * * * docker exec nextcloud sudo -u www-data php /var/www/html/occ preview:pre-generate
+docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ config:app:set --value="256 384" previewgenerator widthSizes
+```
+
+```
+docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ config:app:set --value="256" previewgenerator heightSizes
 ```
 
 ### Update Nextcloud
@@ -167,7 +184,7 @@ sudo chown -R www-data:www-data </path/to/nextcloud/data/>
 
 Then make Nextcloud scan the new files
 ```
-docker exec -i <container_name> sudo -u www-data /var/www/html/occ files:scan <username>
+docker exec -i <CONTAINER_NAME_OR_ID> sudo -u www-data /var/www/html/occ files:scan <username>
 ```
 
 ### Setup cronjobs
@@ -183,7 +200,7 @@ crontab -u <username> -e
 Than paste to the end of the file and save
 
 ```
-*/5 * * * * docker exec <container_name_or_id> sudo -u www-data php -f /var/www/html/cron.php
+*/5 * * * * docker exec <CONTAINER_NAME_OR_ID> sudo -u www-data php -f /var/www/html/cron.php
 ```
 
 Verify that your cron is showing
@@ -222,4 +239,15 @@ curl -u <username:password> https://<url>/remote.php/dav/addressbooks/users/<use
 
 ```
 curl -u <username:password> https://<url>/remote.php/dav/calendars/<username>/<calendar_name>?export -o calendar.ics
+```
+
+### Troubleshooting
+
+If you get this kind of error while running `occ` commands or cronjobs:
+```
+Fatal error: Allowed memory size of 2097152 bytes exhausted
+```
+Add this to your commands after `php`
+```
+-d memory_limit=-1
 ```
