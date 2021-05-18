@@ -66,8 +66,12 @@ PostgreSQL:
 ```
 0 8 * * 1 docker exec <CONTAINER_NAME_OR_ID> pg_dump -U <POSTGRES_USER> <DATABASE_NAME> > <PATH_TO_BACKUPS>/backup_`date +%Y%m%d%H%M%S`.sql
 ```
-
 This one runs every Monday at 8am, you can change it at your convenience.
+
+Bonus: delete backups that are older than 30 days (runs everyday at 12am)
+```
+0 0 * * * find <PATH_TO_BACKUPS> -name "backup_*.sql" -type f -mtime +30 -delete
+```
 
 ### Open a Docker console
 
