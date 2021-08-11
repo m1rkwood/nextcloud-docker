@@ -86,25 +86,8 @@ $ docker ps
 ```
 
 ### Photos & Thumbnails
-
-#### Auto generate thumbnails
-
+#### Install Preview Generator
 In the admin of Nextcloud, install the app `Preview Generator`
-Then on the host server, run this command to generate all previews
-
-```
-docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ preview:generate-all -vvv
-```
-
-Still on the host server, add a cronjob
-
-```
-crontab -u <username> -e
-```
-
-```
-*/30 * * * * docker exec <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ preview:pre-generate
-```
 
 #### Install packages for Video Support
 Videos don't show thumbnails by default in Nextcloud. Here's how to fix it  
@@ -146,6 +129,8 @@ Add these values to the `app/config/config.php`
 'jpeg_quality' => '60',
 ```
 
+Note: previews will take a lot of space after some time, so you can also lower `preview_max_x` & `preview_max_y` to something like `512`.
+
 #### Modify thumbnail sizes
 Default sizes for `previewgenerator` are ok but they're going to take space over time, so I changed their default size. It's also improving the gallery performance overall.
 
@@ -159,6 +144,30 @@ docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ co
 
 ```
 docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ config:app:set --value="256" previewgenerator heightSizes
+```
+
+If you want to regenerate all previews after some time, delete the `app/data/appdata_xxxxx/preview` folder, then run this command so that nextcloud knows they've been deleted:
+```
+docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ files:scan-app-data
+```
+Then regenerate all the previews (see below)
+
+#### Generate the Previews & Setup the cronjob
+
+Then on the host server, run this command to generate all previews once you're finished configuring the previews.
+
+```
+docker exec -it <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ preview:generate-all -vvv
+```
+
+Still on the host server, add a cronjob
+
+```
+crontab -u <username> -e
+```
+
+```
+*/30 * * * * docker exec <CONTAINER_NAME_OR_ID> sudo -u www-data php /var/www/html/occ preview:pre-generate
 ```
 
 #### Ordering Photos
