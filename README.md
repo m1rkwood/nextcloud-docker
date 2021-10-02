@@ -44,13 +44,21 @@ backup your database (postgreSQL)
 ```
 docker exec <CONTAINER_NAME_OR_ID> pg_dump -U <POSTGRES_USER> <DATABASE_NAME> > nextcloud_backup.sql
 ```
+backup all databases (postgreSQL, recommended)
+```
+docker exec <CONTAINER_NAME_OR_ID> pg_dumpall -U <POSTGRES_USER> > nextcloud_backup.sql
+```
 restore your database (mariaDB)
 ```
 cat nextcloud_backup.sql | docker exec -i <CONTAINER_NAME_OR_ID> /usr/bin/mysql -u <MYSQL_USER> --password=<MYSQL_PASSWORD> <DATABASE_NAME>
 ```
 restore your database (postgreSQL)
 ```
-docker exec <CONTAINER_NAME_OR_ID> psql <DATABASE_NAME> < nextcloud_backup.sql
+cat nextcloud_backup.sql | docker exec -i <CONTAINER_NAME_OR_ID> psql -U <POSTGRES_USER> <DATABASE_NAME>
+```
+restore all databases (postgreSQL, recommended)
+```
+cat nextcloud_backup.sql | docker exec -i <CONTAINER_NAME_OR_ID> psql -U <POSTGRES_USER>
 ```
 
 ### Backup the database automatically
@@ -66,12 +74,33 @@ PostgreSQL:
 ```
 0 8 * * 1 docker exec <CONTAINER_NAME_OR_ID> pg_dump -U <POSTGRES_USER> <DATABASE_NAME> > <PATH_TO_BACKUPS>/backup_`date +%Y%m%d%H%M%S`.sql
 ```
+PostgreSQL (backup all databases, recommended):
+```
+0 8 * * 1 docker exec <CONTAINER_NAME_OR_ID> pg_dumpall -U <POSTGRES_USER> > <PATH_TO_BACKUPS>/backup_`date +%Y%m%d%H%M%S`.sql
+```
 This one runs every Monday at 8am, you can change it at your convenience.
 
 Bonus: delete backups that are older than 30 days (runs everyday at 12am)
 ```
 0 0 * * * find <PATH_TO_BACKUPS> -name "backup_*.sql" -type f -mtime +30 -delete
 ```
+
+### PostgreSQL upgrade
+When moving to a new major version of PostgreSQL, you might have following error when restarting the containers:
+```
+FATAL: database files are incompatible with server
+DETAIL: The data directory was initialized by PostgreSQL version X, which is not compatible with this version X
+```
+In that case, you will need to do the following:  
+- Stop all the containers `docker-compose down`
+- If you were using the latest image `postgres:alpine`, you will have to modify the `docker-compose.yml` file with the image of the version of PostgreSQL you were using before the upgrade, i.e. `postgres:13-alpine` for postgres 13.
+- Start the postgres container `docker-compose up -d nextcloud-postgres`
+- Backup all databases as described previously
+- Modify the `docker-compose.yml` file with the image of the version of PostgreSQL you wish to use, i.e. `postgres:alpine` for latest
+- Start the postgres container `docker-compose up -d nextcloud-postgres`
+- Restore your backup as described previously (restore all databases)
+
+After that, you should be able to start all containers safely.
 
 ### Open a Docker console
 
