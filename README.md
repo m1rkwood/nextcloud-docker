@@ -141,7 +141,7 @@ Add these values to the `app/config/config.php`
     3 => 'OC\\Preview\\PDF',
     4 => 'OC\\Preview\\MSOffice2003',
     5 => 'OC\\Preview\\MSOfficeDoc',
-    6 => 'OC\\Preview\\PDF',
+    6 => 'OC\\Preview\\HEIC',
     7 => 'OC\\Preview\\Image',
     8 => 'OC\\Preview\\Photoshop',
     9 => 'OC\\Preview\\TIFF',
