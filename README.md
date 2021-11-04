@@ -206,6 +206,10 @@ Before uploading your pictures to Nextcloud, you can change their Created & Modi
 ```
 exiftool "-filecreatedate<datetimeoriginal" . && exiftool "-FileCreateDate<CreateDate" -ext Mov . && exiftool "-FileModifyDate<datetimeoriginal" . && exiftool "-FileModifyDate<CreateDate" -ext Mov .
 ```
+To do it recursively
+```
+find . -type d -exec exiftool "-filecreatedate<datetimeoriginal" \{\} \; && find . -type d -exec exiftool "-FileCreateDate<CreateDate" -ext Mov \{\} \; && find . -type d -exec exiftool "-FileModifyDate<datetimeoriginal" \{\} \; && find . -type d -exec exiftool "-FileModifyDate<CreateDate" -ext Mov \{\} \;
+```
 
 ### Update Nextcloud
 
