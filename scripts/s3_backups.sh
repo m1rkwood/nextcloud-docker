@@ -4,6 +4,7 @@ DATETIME=`date +%y%m%d-%H_%M_%S`
 DST=$1
 
 showHelp() {
+    echo ''
     echo 'This script will push your backups to a s3 bucket:'
     echo ''
     echo '- Database backups located at /root/nextcloud-docker/backup/database'
@@ -19,23 +20,36 @@ showHelp() {
     echo ''
     echo 'To use this script with a cronjob, you can add it to your crontab:'
     echo '- 0 8 * * 1 sh s3_backups.sh'
+    echo ''
 }
 
 archiveDatabaseBackups() {
     # export the data from nextcloud & compress
+    echo ''
+    echo '[+] exporting data from nextcloud database and compressing'
     docker exec nextcloud-postgres pg_dumpall -U nextcloud | gzip > /root/nextcloud-docker/backups/database/nextcloud_database_backup_$DATETIME.sql.gz
     # upload the data to s3
+    echo ''
+    echo '[+] uploading the data to s3'
     s3cmd put /root/nextcloud-docker/backups/database/nextcloud_database_backup_$DATETIME.sql.gz s3://$DST/Nextcloud/Database/
     # remove backups older than 15 days
+    echo ''
+    echo '[+] cleaning up backups older than 15 days'
     find /root/nextcloud-docker/backups/database -name "*.sql.gz" -type f -mtime +15 -delete
 }
 
 archiveNextcloudConfig() {
     # compress the config folder
+    echo ''
+    echo '[+] exporting config from nextcloud and compressing'
     tar -czvf /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz /root/nextcloud-docker/traefik_postgres/app/config
     # upload the data to s3
+    echo ''
+    echo '[+] uploading the data to s3'
     s3cmd put /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/
     # remove backups older than 15 days
+    echo ''
+    echo '[+] cleaning up backups older than 15 days'
     find /root/nextcloud-docker/backups/app -name "*.tar.gz" -type f -mtime +15 -delete
 }
 
