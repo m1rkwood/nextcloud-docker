@@ -23,20 +23,20 @@ showHelp() {
 
 archiveDatabaseBackups() {
     # export the data from nextcloud & compress
-    docker exec nextcloud-postgres pg_dumpall -U nextcloud | gzip /root/nextcloud-docker/backups/database/nextcloud_database_backup_$DATETIME.sql.gz
+    docker exec nextcloud-postgres pg_dumpall -U nextcloud | gzip > /root/nextcloud-docker/backups/database/nextcloud_database_backup_$DATETIME.sql.gz
     # upload the data to s3
-    s3cmd put /root/nextcloud-docker/backups/database/nextcloud_database_backup_$DATETIME.sql.gz s3://$DST/Nextcloud/Database
+    s3cmd put /root/nextcloud-docker/backups/database/nextcloud_database_backup_$DATETIME.sql.gz s3://$DST/Nextcloud/Database/
     # remove backups older than 15 days
     find /root/nextcloud-docker/backups/database -name "*.sql.gz" -type f -mtime +15 -delete
 }
 
 archiveNextcloudConfig() {
     # compress the config folder
-    gzip /root/nextcloud-docker/traefik_postgres/app/config /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.gz
+    tar -czvf /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz /root/nextcloud-docker/traefik_postgres/app/config
     # upload the data to s3
-    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.gz s3://$DST/Nextcloud/App
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/
     # remove backups older than 15 days
-    find /root/nextcloud-docker/backups/app -name "*.gz" -type f -mtime +15 -delete
+    find /root/nextcloud-docker/backups/app -name "*.tar.gz" -type f -mtime +15 -delete
 }
 
 if [ ! -z "$DST" ]; then
