@@ -38,15 +38,19 @@ archiveDatabaseBackups() {
     find /root/nextcloud-docker/backups/database -name "*.sql.gz" -type f -mtime +15 -delete
 }
 
-archiveNextcloudConfig() {
+archiveNextcloudApp() {
     # compress the config folder
     echo ''
     echo '[+] exporting config from nextcloud and compressing'
     tar -czvf /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz /root/nextcloud-docker/traefik_postgres/app/config
+    tar -czvf /root/nextcloud-docker/backups/app/nextcloud_themes_backup_$DATETIME.tar.gz /root/nextcloud-docker/traefik_postgres/app/themes
+    tar -czvf /root/nextcloud-docker/backups/app/nextcloud_custom_apps_backup_$DATETIME.tar.gz /root/nextcloud-docker/traefik_postgres/app/custom_apps
     # upload the data to s3
     echo ''
     echo '[+] uploading the data to s3'
     s3cmd put /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_themes_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_custom_apps_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/
     # remove backups older than 15 days
     echo ''
     echo '[+] cleaning up backups older than 15 days'
@@ -61,7 +65,7 @@ if [ ! -z "$DST" ]; then
 
     if [ $answer = "yes" ]; then
         archiveDatabaseBackups
-        archiveNextcloudConfig
+        archiveNextcloudApp
     else
         echo '[!] Canceled by user.'
     fi
