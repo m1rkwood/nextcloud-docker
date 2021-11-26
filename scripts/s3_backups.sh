@@ -2,6 +2,7 @@
 # source: https://www.digitalocean.com/community/tutorials/how-to-automate-backups-digitalocean-spaces
 DATETIME=`date +%y%m%d-%H_%M_%S`
 DST=$1
+SKIP=$2
 
 showHelp() {
     echo ''
@@ -60,14 +61,20 @@ archiveNextcloudApp() {
 if [ ! -z "$DST" ]; then
     showHelp
 
-    echo '[?] Do you want to continue [yes/no] ?'
-    read answer
-
-    if [ $answer = "yes" ]; then
+    if  [[ $SKIP = "--skip-confirmation" ]]; then
+        echo '[+] Confirmation was skipped by user'
         archiveDatabaseBackups
         archiveNextcloudApp
     else
-        echo '[!] Canceled by user.'
+        echo '[?] Do you want to continue [yes/no] ?'
+        read answer
+
+        if [ $answer = "yes" ]; then
+            archiveDatabaseBackups
+            archiveNextcloudApp
+        else
+            echo '[!] Canceled by user'
+         fi
     fi
 else
     echo '[!] Missing Destination bucket name as argument'
