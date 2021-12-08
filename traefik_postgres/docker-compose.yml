@@ -22,7 +22,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - REDIS_HOST=nextcloud-redis
       - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
-      - TRUSTED_PROXIES=172.18.0.0/16
+      - TRUSTED_PROXIES=${TRUSTED_PROXIES}
     labels:
       - traefik.enable=true
       - traefik.http.routers.nextcloud.rule=Host(`${SUB_DOMAIN}.${DOMAIN_NAME}`)

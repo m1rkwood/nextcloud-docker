@@ -22,12 +22,15 @@ SUB_DOMAIN=
 DOMAIN_NAME=
 POSTGRES_PASSWORD=
 REDIS_PASSWORD=
+TRUSTED_PROXIES=
 ```
 
 For `NEXTCLOUD_ROOT`, navigate to your desired folder, and type `pwd` to know its absolute path. Any path will do, as an example, `/home/nextcloud` or `/root/nextcloud` will both work. For the passwords, generate strong passwords.
 
 `SUB_DOMAIN` is the sub-domain used, i.e. `cloud`  
 `DOMAIN_NAME` is the domain used, i.e. `example.com`
+
+`TRUSTED_PROXIES`, for this I used the subnet from the `web` network that we created in the [traefik-docker](https://github.com/m1rkwood/traefik-docker) container. For this, run `docker network inspect web` and get the value under `Subnet`.
 
 ## Build the image & start the containers
 
