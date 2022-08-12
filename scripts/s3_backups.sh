@@ -49,9 +49,9 @@ archiveNextcloudApp() {
     # upload the data to s3
     echo ''
     echo '[+] uploading the data to s3'
-    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Config
-    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_themes_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Themes
-    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_custom_apps_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Apps
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Config/
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_themes_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Themes/
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_custom_apps_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Apps/
     # remove backups older than 15 days
     echo ''
     echo '[+] cleaning up backups older than 15 days'
