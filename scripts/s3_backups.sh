@@ -12,7 +12,7 @@ showHelp() {
     echo '- Nextcloud config located at /root/nextcloud-docker/traefik_postgres/app/config'
     echo ''
     echo 'Database backups will be uploaded to bucket-name/Nextcloud/Database'
-    echo 'Nextcloud config backups will be uploaded to bucket-name/Nextcloud/App'
+    echo 'Nextcloud config backups will be uploaded to bucket-name/Nextcloud/App/(Config/Themes/Apps)'
     echo 'Make sure these folders exist in your bucket'
     echo ''
     echo 's3cmd must be installed on this server: apt install s3cmd && s3cmd --configure'
@@ -49,9 +49,9 @@ archiveNextcloudApp() {
     # upload the data to s3
     echo ''
     echo '[+] uploading the data to s3'
-    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/
-    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_themes_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/
-    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_custom_apps_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_config_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Config
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_themes_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Themes
+    s3cmd put /root/nextcloud-docker/backups/app/nextcloud_custom_apps_backup_$DATETIME.tar.gz s3://$DST/Nextcloud/App/Apps
     # remove backups older than 15 days
     echo ''
     echo '[+] cleaning up backups older than 15 days'
@@ -79,5 +79,3 @@ if [ ! -z "$DST" ]; then
 else
     echo '[!] Missing Destination bucket name as argument'
 fi
-
-
