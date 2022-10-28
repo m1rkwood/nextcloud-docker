@@ -1,10 +1,10 @@
-FROM nextcloud:latest
+FROM nextcloud:stable
 
 RUN apt-get update
 
 #
 # packages for nextcloud video previews
-RUN apt install -y ffmpeg imagemagick ghostscript 
+RUN apt install -y ffmpeg imagemagick ghostscript
 
 #
 # other packages I want to install
