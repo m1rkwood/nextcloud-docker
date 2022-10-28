@@ -2,8 +2,8 @@
 
 ## Choose your Setup
 
-This is a setup for nextcloud via docker.  
-It has multiple configurations available:  
+This is a setup for nextcloud via docker.
+It has multiple configurations available:
 All configurations use Redis and MariaDB. The difference is how they handle SSL and reverse-proxy.
 
 - `nginx_proxy`: the setup handles SSL certificates through letsencrypt and a nginx reverse proxy.
@@ -11,8 +11,8 @@ All configurations use Redis and MariaDB. The difference is how they handle SSL 
 - `traefik`: uses traefik for routing, easier to add other services on top.
 - `traefik_postgres`: same, but with postgreSQL as a database.
 
-Choose the one you are the most comfortable with. Each folder has its own `README.md` file to install its specific case.  
-If you choose the `traefik` or `traefik_postgres` version, you will have to also install the `traefik-docker` project available [here](https://github.com/m1rkwood/traefik-docker).  
+Choose the one you are the most comfortable with. Each folder has its own `README.md` file to install its specific case.
+If you choose the `traefik` or `traefik_postgres` version, you will have to also install the `traefik-docker` project available [here](https://github.com/m1rkwood/traefik-docker).
 
 Note: on smaller instances, I found postgreSQL to be more reliable, doesn't time out as much, doesn't go out of memory as much.
 
@@ -63,7 +63,7 @@ cat nextcloud_backup.sql | docker exec -i <CONTAINER_NAME_OR_ID> psql -U <POSTGR
 
 ### Backup the database automatically
 
-You can add a cronjob to backup your database regularly.  
+You can add a cronjob to backup your database regularly.
 On the host server, run `crontab -u <username> -e` and add the following:
 
 MariaDB:
@@ -91,13 +91,15 @@ When moving to a new major version of PostgreSQL, you might have following error
 FATAL: database files are incompatible with server
 DETAIL: The data directory was initialized by PostgreSQL version X, which is not compatible with this version X
 ```
-In that case, you will need to do the following:  
+In that case, you will need to do the following:
 - Stop all the containers `docker-compose down`
 - If you were using the latest image `postgres:alpine`, you will have to modify the `docker-compose.yml` file with the image of the version of PostgreSQL you were using before the upgrade, i.e. `postgres:13-alpine` for postgres 13.
-- Start the postgres container `docker-compose up -d nextcloud-postgres`
+- Start the postgres container `docker-compose up -d postgres`
 - Backup all databases as described previously
+- Stop the container `docker-compose down`
+- Delete the database volume `docker-compose volume rm <VOLUME_NAME_OR_ID>`
 - Modify the `docker-compose.yml` file with the image of the version of PostgreSQL you wish to use, i.e. `postgres:alpine` for latest
-- Start the postgres container `docker-compose up -d nextcloud-postgres`
+- Start the postgres container `docker-compose up -d postgres`
 - Restore your backup as described previously (restore all databases)
 
 After that, you should be able to start all containers safely.
@@ -119,7 +121,7 @@ $ docker ps
 In the admin of Nextcloud, install the app `Preview Generator`
 
 #### Install packages for Video Support
-Videos don't show thumbnails by default in Nextcloud. Here's how to fix it  
+Videos don't show thumbnails by default in Nextcloud. Here's how to fix it
 
 Skip this step if you're using my Dockerfile, these packages will be installed by default.
 
@@ -229,7 +231,7 @@ find . -type d -exec exiftool "-filecreatedate<datetimeoriginal" \{\} \; && find
 
 ### Scan new files on the server
 
-If you happen to add files directly on the server and want to see them in your Nextcloud instance, add them to your files at `app/data/<USERNAME>/files/`  
+If you happen to add files directly on the server and want to see them in your Nextcloud instance, add them to your files at `app/data/<USERNAME>/files/`
 
 Navigate to the new folder and add the proper permissions to the files
 ```
@@ -265,7 +267,7 @@ crontab -u <username> -l
 
 ### Resync birthday calendar
 
-I tested importing/exporting my calendars & contacts to Nextcloud and this resulted in showing multiple events for birthdays. You can fix it by resyncing the birthday calendar:  
+I tested importing/exporting my calendars & contacts to Nextcloud and this resulted in showing multiple events for birthdays. You can fix it by resyncing the birthday calendar:
 First, open a docker console
 
 ```
