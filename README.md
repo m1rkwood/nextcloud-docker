@@ -97,7 +97,7 @@ In that case, you will need to do the following:
 - Start the postgres container `docker-compose up -d postgres`
 - Backup all databases as described previously
 - Stop the container `docker-compose down`
-- Delete the database volume `docker-compose volume rm <VOLUME_NAME_OR_ID>`
+- Delete the database volume `docker volume rm <VOLUME_NAME_OR_ID>`
 - Modify the `docker-compose.yml` file with the image of the version of PostgreSQL you wish to use, i.e. `postgres:alpine` for latest
 - Start the postgres container `docker-compose up -d postgres`
 - Restore your backup as described previously (restore all databases)

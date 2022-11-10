@@ -48,7 +48,7 @@ services:
       - internal
 
   postgres:
-    image: postgres:alpine
+    image: postgres:14-alpine
     container_name: nextcloud-postgres
     restart: always
     volumes:
